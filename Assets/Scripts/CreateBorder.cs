@@ -9,19 +9,19 @@ public class CreateBorder : MonoBehaviour {
 
 	void Awake() {
 		// Bottom row
-		Vector3 start = new Vector3(-5.5f, -5.5f, 1);
+		Vector3 start = new Vector3(-5.5f, -5.5f, -1);
 		CreateRow(Dim, i => start + i * Vector3.right);
 
 		// Top row
-		start = new Vector3(-5.5f, 5.5f, 1);
+		start = new Vector3(-5.5f, 5.5f, -1);
 		CreateRow(Dim, i => start + i * Vector3.right);
 
 		// Right column
-		start = new Vector3(5.5f, 4.5f, 1);
+		start = new Vector3(5.5f, 4.5f, -1);
 		CreateRow(Dim - 2, i => start + i * Vector3.down);
 
 		// Left column
-		start = new Vector3(-5.5f, 4.5f, 1);
+		start = new Vector3(-5.5f, 4.5f, -1);
 		CreateRow(Dim - 2, i => start + i * Vector3.down);
 	}
 

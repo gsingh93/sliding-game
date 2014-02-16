@@ -8,22 +8,22 @@ public class CameraAngle : MonoBehaviour {
 	}
 
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.A)) {
+		if (Input.GetKeyDown(KeyCode.Z)) {
 			IsometricView();
-		} else if (Input.GetKeyDown(KeyCode.B)) {
+		} else if (Input.GetKeyDown(KeyCode.X)) {
 			FlatView();
 		}
 	}
 
 	void IsometricView() {
-		camera.transform.position = new Vector3(10, 10, 10);
+		camera.transform.position = new Vector3(10, 10, -10);
 		StartCoroutine(rotate(new Vector3(40, 240, 250)));
 		//camera.transform.localEulerAngles = new Vector3(40, 240, 250);
 	}
 
 	void FlatView() {
-		camera.transform.position = new Vector3(0, 0, 10);
-		StartCoroutine(rotate(new Vector3(0, 180, 0)));
+		camera.transform.position = new Vector3(0, 0, -10);
+		StartCoroutine(rotate(new Vector3(0, 0, 0)));
 		//camera.transform.localEulerAngles = new Vector3(0, 180, 0);
 	}
 
