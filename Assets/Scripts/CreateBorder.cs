@@ -5,31 +5,28 @@ using System.Collections;
 public class CreateBorder : MonoBehaviour {
 	public GameObject blockPrefab;
 
-	private const int Dim = 12;
-
 	void Awake() {
+		Grid g = GetComponent<Grid>();
+		int dim = Grid.Dim;
+
 		// Bottom row
-		Vector3 start = new Vector3(-5.5f, -5.5f, -1);
-		CreateRow(Dim, i => start + i * Vector3.right);
+		CreateRow(dim, i => g.PosToCoord(dim - 1, i));
 
 		// Top row
-		start = new Vector3(-5.5f, 5.5f, -1);
-		CreateRow(Dim, i => start + i * Vector3.right);
+		CreateRow(dim, i => g.PosToCoord(0, i));
 
 		// Right column
-		start = new Vector3(5.5f, 4.5f, -1);
-		CreateRow(Dim - 2, i => start + i * Vector3.down);
+		CreateRow(dim - 2, i => g.PosToCoord(i + 1, 0));
 
 		// Left column
-		start = new Vector3(-5.5f, 4.5f, -1);
-		CreateRow(Dim - 2, i => start + i * Vector3.down);
+		CreateRow(dim - 2, i => g.PosToCoord(i + 1, dim - 1));
 	}
 
 	private void CreateRow(int length, Func<int, Vector3> placementFunc) {
 		for (int i = 0; i < length; i++) {
 			GameObject block = Instantiate(blockPrefab) as GameObject;
 			block.transform.position = placementFunc(i);
-			block.transform.parent = gameObject.transform;
+			block.transform.parent = transform;
 		}
 	}
 }
