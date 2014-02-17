@@ -8,6 +8,14 @@ public class Piece : MonoBehaviour {
 	public GameObject leftArrowPrefab;
 	public GameObject rightArrowPrefab;
 
+	private enum State {
+		Sliding, Stationary
+	}
+	private State state = State.Stationary;
+
+	// True if we need to draw arrows, false otherwise
+	private bool drawArrows;
+
 	private int[] dr = {-1, 1, 0, 0};
 	private int[] dc = {0, 0, 1, -1};
 
@@ -24,6 +32,28 @@ public class Piece : MonoBehaviour {
 	}
 
 	void Update() {
+		switch(state) {
+		case State.Sliding:
+			drawArrows = true;
+			if (transform.rigidbody.velocity == Vector3.zero) {
+				state = State.Stationary;
+			}
+			break;
+		case State.Stationary:
+			handleKeyboardInput();
+			if (transform.rigidbody.velocity != Vector3.zero) {
+				state = State.Sliding;
+				DestroyArrows();
+			}
+			if (drawArrows) {
+				CreateArrows();
+				drawArrows = false;
+			}
+			break;
+		}
+	}
+
+	void handleKeyboardInput() {
 		if (Input.GetKeyDown(KeyCode.A)) {
 			transform.rigidbody.velocity = Vector3.left * 10;
 		} else if (Input.GetKeyDown(KeyCode.D)) {
@@ -36,7 +66,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision) {
-		//transform.rigidbody.velocity = Vector3.zero;
+		transform.rigidbody.velocity = Vector3.zero;
 	}
 
 	private void CreateArrows() {
@@ -63,5 +93,11 @@ public class Piece : MonoBehaviour {
 
 		arrow.transform.parent = transform;
 		arrow.transform.position = transform.position + new Vector3(dc[index], -dr[index], 0);
+	}
+
+	private void DestroyArrows() {
+		foreach (Transform t in transform) {
+			Destroy(t.gameObject);
+		}
 	}
 }
