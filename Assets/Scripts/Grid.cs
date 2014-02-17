@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Text;
 
 public class Grid : MonoBehaviour {
 
@@ -10,7 +11,7 @@ public class Grid : MonoBehaviour {
 	}
 
 	public enum Player {
-		One, Two
+		One, Two, Neither
 	}
 
 	private class Square {
@@ -19,6 +20,7 @@ public class Grid : MonoBehaviour {
 
 		public Square() {
 			type = SquareType.Empty;
+			player = Player.Neither;
 		}
 	}
 
@@ -31,6 +33,25 @@ public class Grid : MonoBehaviour {
 				grid[i, j] = new Square();
 			}
 		}
+		GetComponent<CreateBorder>().DrawBorder(this);
+	}
+
+	public void Print() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < Dim; i++) {
+			for (int j = 0; j < Dim; j++) {
+				sb.Append(grid[i, j].type == SquareType.Empty ? "E" : "B");
+			}
+			sb.AppendLine("");
+		}
+
+		Debug.Log(sb.ToString());
+	}
+
+	public void SetSquare(int row, int col, SquareType type) {
+		BoundsCheck(row, col);
+
+		grid[row, col].type = type;
 	}
 
 	public bool IsEmpty(int row, int col) {

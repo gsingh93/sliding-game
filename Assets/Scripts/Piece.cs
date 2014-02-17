@@ -25,9 +25,7 @@ public class Piece : MonoBehaviour {
 
 	void Start() {
 		g = GameObject.Find("Board").GetComponent<Grid>();
-		Pair<int, int> p = g.CoordToPos(transform.position);
-		row = p.First;
-		col = p.Second;
+		UpdatePosition();
 		CreateArrows();
 	}
 
@@ -35,9 +33,6 @@ public class Piece : MonoBehaviour {
 		switch(state) {
 		case State.Sliding:
 			drawArrows = true;
-			if (transform.rigidbody.velocity == Vector3.zero) {
-				state = State.Stationary;
-			}
 			break;
 		case State.Stationary:
 			handleKeyboardInput();
@@ -46,11 +41,18 @@ public class Piece : MonoBehaviour {
 				DestroyArrows();
 			}
 			if (drawArrows) {
+				UpdatePosition();
 				CreateArrows();
 				drawArrows = false;
 			}
 			break;
 		}
+	}
+
+	void UpdatePosition() {
+		Pair<int, int> p = g.CoordToPos(transform.position);
+		row = p.First;
+		col = p.Second;
 	}
 
 	void handleKeyboardInput() {
@@ -67,6 +69,7 @@ public class Piece : MonoBehaviour {
 
 	void OnCollisionEnter(Collision collision) {
 		transform.rigidbody.velocity = Vector3.zero;
+		state = State.Stationary;
 	}
 
 	private void CreateArrows() {
