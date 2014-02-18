@@ -28,9 +28,9 @@ public class CameraAngle : MonoBehaviour {
 	}
 
 	IEnumerator rotate(Vector3 to) {
-		int seconds = 2;
-		int iterations = 10;
-		float waitTime = seconds/iterations;
+		float seconds = 0.5f;
+		int iterations = 25;
+		float waitTime = seconds / iterations;
 
 		Vector3 step = (to - camera.transform.localEulerAngles) / iterations;
 

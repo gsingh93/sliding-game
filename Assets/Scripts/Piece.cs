@@ -18,6 +18,8 @@ public class Piece : MonoBehaviour {
 	// True if we need to draw arrows, false otherwise
 	private bool drawArrows;
 
+	private bool moving;
+
 	private int[] dr = {-1, 1, 0, 0};
 	private int[] dc = {0, 0, 1, -1};
 
@@ -34,8 +36,10 @@ public class Piece : MonoBehaviour {
 	void Update() {
 		switch(state) {
 		case State.Sliding:
-			drawArrows = true;
-			state = State.Stationary;
+			if (moving == false) {
+				drawArrows = true;
+				state = State.Stationary;
+			}
 			break;
 		case State.Stationary:
 			if (handleKeyboardInput()) {
@@ -78,8 +82,8 @@ public class Piece : MonoBehaviour {
 		}
 		row = p.First;
 		col = p.Second;
-		
-		transform.position = g.PosToCoord(row, col);
+
+		StartCoroutine(move(g.PosToCoord(row, col)));
 		
 		return true;
 	}
@@ -114,5 +118,24 @@ public class Piece : MonoBehaviour {
 		foreach (Transform t in transform) {
 			Destroy(t.gameObject);
 		}
+	}
+
+	private IEnumerator move(Vector3 to) {
+		moving = true;
+
+		float seconds = 0.2f;
+		int iterations = 25;
+		float waitTime = seconds / iterations;
+		
+		Vector3 step = (to - transform.position) / iterations;
+		
+		for (int i = 0; i < iterations; i++) {
+			transform.position += step;
+			yield return new WaitForSeconds(waitTime);
+		}
+		
+		transform.position = to;
+
+		moving = false;
 	}
 }
