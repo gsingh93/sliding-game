@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using Direction = Grid.Direction;
+
 public class Piece : MonoBehaviour {
 
 	public GameObject upArrowPrefab;
@@ -33,13 +35,14 @@ public class Piece : MonoBehaviour {
 		switch(state) {
 		case State.Sliding:
 			drawArrows = true;
+			state = State.Stationary;
 			break;
 		case State.Stationary:
-			handleKeyboardInput();
-			if (transform.rigidbody.velocity != Vector3.zero) {
+			if (handleKeyboardInput()) {
 				state = State.Sliding;
 				DestroyArrows();
 			}
+
 			if (drawArrows) {
 				UpdatePosition();
 				CreateArrows();
@@ -55,21 +58,30 @@ public class Piece : MonoBehaviour {
 		col = p.Second;
 	}
 
-	void handleKeyboardInput() {
+	bool handleKeyboardInput() {
+		Direction dir;
 		if (Input.GetKeyDown(KeyCode.A)) {
-			transform.rigidbody.velocity = Vector3.left * 10;
+			dir = Direction.Left;
 		} else if (Input.GetKeyDown(KeyCode.D)) {
-			transform.rigidbody.velocity = Vector3.right * 10;
+			dir = Direction.Right;
 		} else if (Input.GetKeyDown(KeyCode.W)) {
-			transform.rigidbody.velocity = Vector3.up * 10;
+			dir = Direction.Up;
 		} else if (Input.GetKeyDown(KeyCode.S)) {
-			transform.rigidbody.velocity = Vector3.down * 10;
+			dir = Direction.Down;
+		} else {
+			return false;
 		}
-	}
 
-	void OnCollisionEnter(Collision collision) {
-		transform.rigidbody.velocity = Vector3.zero;
-		state = State.Stationary;
+		Pair<int, int> p = g.FindOpenSquare(dir, row, col);
+		if (p == null) {
+			return false;
+		}
+		row = p.First;
+		col = p.Second;
+		
+		transform.position = g.PosToCoord(row, col);
+		
+		return true;
 	}
 
 	private void CreateArrows() {
@@ -82,9 +94,9 @@ public class Piece : MonoBehaviour {
 
 	private void CreateArrow(int index) {
 		GameObject arrow;
-		if (dr[index] == 1) {         // Down
+		if (dr[index] == -1) {        // Down
 			arrow = Instantiate(downArrowPrefab) as GameObject;
-		} else if (dr[index] == -1) { // Up
+		} else if (dr[index] == 1) {  // Up
 			arrow = Instantiate(upArrowPrefab) as GameObject;
 		} else if (dc[index] == -1) { // Left
 			arrow = Instantiate(leftArrowPrefab) as GameObject;
@@ -95,7 +107,7 @@ public class Piece : MonoBehaviour {
 		}
 
 		arrow.transform.parent = transform;
-		arrow.transform.position = transform.position + new Vector3(dc[index], -dr[index], 0);
+		arrow.transform.position = transform.position + new Vector3(dc[index], dr[index], 0);
 	}
 
 	private void DestroyArrows() {

@@ -10,37 +10,86 @@ public class Grid : MonoBehaviour {
 		Empty, Block, Player1, Player2, Coin
 	}
 
-	public enum Player {
-		One, Two, Neither
-	}
-
-	private class Square {
+	public class Square {
 		public SquareType type;
-		public Player player;
 
-		public Square() {
-			type = SquareType.Empty;
-			player = Player.Neither;
+		public Square(SquareType type) {
+			this.type = type;
 		}
 	}
 
+	public enum Direction {
+		Up, Down, Left, Right
+	}
+	
 	private Square[,] grid;
 
 	void Awake() {
 		grid = new Square[Dim, Dim];
 		for (int i = 0; i < Dim; i++) {
 			for (int j = 0; j < Dim; j++) {
-				grid[i, j] = new Square();
+				SquareType type = SquareType.Empty;
+				if (i == 0 || i == Dim - 1 || j == 0 || j == Dim - 1) {
+					type = SquareType.Block;
+				}
+				grid[i, j] = new Square(type);
 			}
 		}
-		GetComponent<CreateBorder>().DrawBorder(this);
+	}
+
+	public Pair<int, int> FindOpenSquare(Direction dir, int row, int col) {
+		int stepX = 0;
+		int stepY = 0;
+
+		switch (dir) {
+		case Direction.Up:
+			stepX = 0;
+			stepY = 1;
+			break;
+		case Direction.Down:
+			stepX = 0;
+			stepY = -1;
+			break;
+		case Direction.Left:
+			stepX = -1;
+			stepY = 0;
+			break;
+		case Direction.Right:
+			stepX = 1;
+			stepY = 0;
+			break;
+		}
+
+		int i;
+		for (i = 1; IsEmpty(row + stepY * i, col + stepX * i); i++) {}
+
+		if (i == 1) {
+			return null;
+		} else {
+			i--;
+			return new Pair<int, int>(row + stepY * i, col + stepX * i);
+		}
+
 	}
 
 	public void Print() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < Dim; i++) {
 			for (int j = 0; j < Dim; j++) {
-				sb.Append(grid[i, j].type == SquareType.Empty ? "E" : "B");
+				switch(grid[i, j].type) {
+				case SquareType.Empty:
+					sb.Append("E");
+					break;
+				case SquareType.Block:
+					sb.Append("B");
+					break;
+				case SquareType.Player1:
+					sb.Append("1");
+					break;
+				case SquareType.Player2:
+					sb.Append("2");
+					break;
+				}
 			}
 			sb.AppendLine("");
 		}
@@ -48,10 +97,10 @@ public class Grid : MonoBehaviour {
 		Debug.Log(sb.ToString());
 	}
 
-	public void SetSquare(int row, int col, SquareType type) {
+	public void SetSquare(int row, int col, Square square) {
 		BoundsCheck(row, col);
 
-		grid[row, col].type = type;
+		grid[row, col] = square;
 	}
 
 	public bool IsEmpty(int row, int col) {
@@ -63,7 +112,7 @@ public class Grid : MonoBehaviour {
 	public Vector3 PosToCoord(int row, int col) {
 		BoundsCheck(row, col);
 
-		return new Vector3(-5.5f + col, 5.5f - row, -1);
+		return new Vector3(-5.5f + col, -5.5f + row, -1);
 	}
 
 	public Pair<int, int> CoordToPos(Vector3 coord) {
