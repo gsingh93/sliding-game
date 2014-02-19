@@ -42,16 +42,17 @@ public class Piece : MonoBehaviour {
 			}
 			break;
 		case State.Stationary:
-			if (handleKeyboardInput()) {
-				state = State.Sliding;
-				DestroyArrows();
-			}
-
 			if (drawArrows) {
 				UpdatePosition();
 				CreateArrows();
 				drawArrows = false;
 			}
+
+			if (handleKeyboardInput()) {
+				state = State.Sliding;
+				DestroyArrows();
+			}
+
 			break;
 		}
 	}
