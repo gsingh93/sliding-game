@@ -124,14 +124,17 @@ public class Piece : MonoBehaviour {
 	private IEnumerator move(Vector3 to) {
 		moving = true;
 
-		float seconds = 0.2f;
-		int iterations = 25;
-		float waitTime = seconds / iterations;
-		
-		Vector3 step = (to - transform.position) / iterations;
+		// Velocity in blocks per second
+		Vector3 velocity = 6f * (to - transform.position).normalized;
+		float distance = Mathf.Abs((to - transform.position).magnitude);
+		float time = distance / velocity.magnitude;
+
+		int iterations = 50;
+		float waitTime = time / iterations;
 		
 		for (int i = 0; i < iterations; i++) {
-			transform.position += step;
+			Vector3 p = velocity * waitTime;
+			transform.position += p;
 			yield return new WaitForSeconds(waitTime);
 		}
 		
