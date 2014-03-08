@@ -10,6 +10,8 @@ public class Piece : MonoBehaviour {
 	public GameObject leftArrowPrefab;
 	public GameObject rightArrowPrefab;
 
+	private float speed = 0.2f;
+
 	private bool _isActive = false;
 	private bool isActive {
 		get { return _isActive; }
@@ -37,6 +39,7 @@ public class Piece : MonoBehaviour {
 	private int[] dr = {-1, 1, 0, 0};
 	private int[] dc = {0, 0, 1, -1};
 
+	// TODO: Make property and always call g.SetSquare()
 	private int row, col;
 
 	private Grid g;
@@ -90,8 +93,14 @@ public class Piece : MonoBehaviour {
 
 	private void UpdatePosition() {
 		Pair<int, int> p = g.CoordToPos(transform.position);
-		row = p.First;
-		col = p.Second;
+		ChangePosition(p.First, p.Second);
+	}
+
+	private void ChangePosition(int r, int c) {
+		g.SetSquare(row, col, new Grid.Square(Grid.SquareType.Empty));
+		row = r;
+		col = c;
+		g.SetSquare(row, col, new Grid.Square(Grid.SquareType.Player1));
 	}
 
 	private bool HandleKeyboardInput() {
@@ -112,8 +121,8 @@ public class Piece : MonoBehaviour {
 		if (p == null) {
 			return false;
 		}
-		row = p.First;
-		col = p.Second;
+
+		ChangePosition(p.First, p.Second);
 
 		StartCoroutine(move(g.PosToCoord(row, col)));
 		
@@ -155,7 +164,7 @@ public class Piece : MonoBehaviour {
 	private IEnumerator move(Vector3 to) {
 		moving = true;
 
-		Vector3 velocity = 0.1f * (to - transform.position).normalized;
+		Vector3 velocity = speed * (to - transform.position).normalized;
 		while (transform.position != to) {
 			transform.position += velocity;
 			yield return null;

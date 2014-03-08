@@ -41,6 +41,7 @@ public class Grid : MonoBehaviour {
 		int stepX = 0;
 		int stepY = 0;
 
+		// TODO
 		switch (dir) {
 		case Direction.Up:
 			stepX = 0;
