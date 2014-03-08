@@ -10,6 +10,20 @@ public class Piece : MonoBehaviour {
 	public GameObject leftArrowPrefab;
 	public GameObject rightArrowPrefab;
 
+	private bool _isActive = false;
+	private bool isActive {
+		get { return _isActive; }
+		set {
+			if (value) {
+				SetAllInactive();
+				CreateArrows();
+			} else {
+				DestroyArrows();
+			}
+			_isActive = value;
+		}
+	}
+
 	private enum State {
 		Sliding, Stationary
 	}
@@ -26,14 +40,29 @@ public class Piece : MonoBehaviour {
 	private int row, col;
 
 	private Grid g;
+	private Piece[] pieces;
 
-	void Start() {
+	private void Start() {
 		g = GameObject.Find("Board").GetComponent<Grid>();
+		pieces = transform.parent.GetComponentsInChildren<Piece>();
 		UpdatePosition();
-		CreateArrows();
+	}
+	
+	private void OnMouseDown() {
+		isActive = true;
 	}
 
-	void Update() {
+	private void SetAllInactive() {
+		foreach (Piece p in pieces) {
+			p.isActive = false;
+		}
+	}
+
+	private void Update() {
+		if (!isActive) {
+			return;
+		}
+
 		switch(state) {
 		case State.Sliding:
 			if (moving == false) {
@@ -49,7 +78,7 @@ public class Piece : MonoBehaviour {
 				drawArrows = false;
 			}
 
-			if (handleKeyboardInput()) {
+			if (HandleKeyboardInput()) {
 				state = State.Sliding;
 				DestroyArrows();
 				Camera.main.audio.Play();
@@ -59,13 +88,13 @@ public class Piece : MonoBehaviour {
 		}
 	}
 
-	void UpdatePosition() {
+	private void UpdatePosition() {
 		Pair<int, int> p = g.CoordToPos(transform.position);
 		row = p.First;
 		col = p.Second;
 	}
 
-	bool handleKeyboardInput() {
+	private bool HandleKeyboardInput() {
 		Direction dir;
 		if (Input.GetKeyDown(KeyCode.A)) {
 			dir = Direction.Left;
