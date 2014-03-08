@@ -4,7 +4,7 @@ using System.Collections;
 using Direction = Grid.Direction;
 
 public class Piece : MonoBehaviour {
-
+	
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
 	public GameObject leftArrowPrefab;
@@ -39,6 +39,7 @@ public class Piece : MonoBehaviour {
 			if (moving == false) {
 				drawArrows = true;
 				state = State.Stationary;
+				Camera.main.audio.Stop();
 			}
 			break;
 		case State.Stationary:
@@ -51,6 +52,7 @@ public class Piece : MonoBehaviour {
 			if (handleKeyboardInput()) {
 				state = State.Sliding;
 				DestroyArrows();
+				Camera.main.audio.Play();
 			}
 
 			break;
@@ -124,20 +126,11 @@ public class Piece : MonoBehaviour {
 	private IEnumerator move(Vector3 to) {
 		moving = true;
 
-		// Velocity in blocks per second
-		Vector3 velocity = 6f * (to - transform.position).normalized;
-		float distance = Mathf.Abs((to - transform.position).magnitude);
-		float time = distance / velocity.magnitude;
-
-		int iterations = 50;
-		float waitTime = time / iterations;
-		
-		for (int i = 0; i < iterations; i++) {
-			Vector3 p = velocity * waitTime;
-			transform.position += p;
-			yield return new WaitForSeconds(waitTime);
+		Vector3 velocity = 0.1f * (to - transform.position).normalized;
+		while (transform.position != to) {
+			transform.position += velocity;
+			yield return null;
 		}
-		
 		transform.position = to;
 
 		moving = false;
