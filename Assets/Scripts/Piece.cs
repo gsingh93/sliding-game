@@ -2,9 +2,17 @@
 using System.Collections;
 
 using Direction = Grid.Direction;
+using Square = Grid.Square;
+using SquareType = Grid.SquareType;
 
 public class Piece : MonoBehaviour {
-	
+
+	public Player player;
+	private static Player turn = Player.Player1;
+	public enum Player {
+		Player1, Player2
+	}
+
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
 	public GameObject leftArrowPrefab;
@@ -39,7 +47,6 @@ public class Piece : MonoBehaviour {
 	private int[] dr = {-1, 1, 0, 0};
 	private int[] dc = {0, 0, 1, -1};
 
-	// TODO: Make property and always call g.SetSquare()
 	private int row, col;
 
 	private Grid g;
@@ -52,7 +59,9 @@ public class Piece : MonoBehaviour {
 	}
 	
 	private void OnMouseDown() {
-		isActive = true;
+		if (turn == player) {
+			isActive = true;
+		}
 	}
 
 	private void SetAllInactive() {
@@ -62,7 +71,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (!isActive) {
+		if (!isActive || turn != player) {
 			return;
 		}
 
@@ -71,6 +80,7 @@ public class Piece : MonoBehaviour {
 			if (moving == false) {
 				drawArrows = true;
 				state = State.Stationary;
+				turn = player == Player.Player1 ? Player.Player2 : Player.Player1;
 				Camera.main.audio.Stop();
 			}
 			break;
@@ -97,10 +107,11 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void ChangePosition(int r, int c) {
-		g.SetSquare(row, col, new Grid.Square(Grid.SquareType.Empty));
+		g.SetSquare(row, col, new Square(SquareType.Empty));
 		row = r;
 		col = c;
-		g.SetSquare(row, col, new Grid.Square(Grid.SquareType.Player1));
+		SquareType type = player == Player.Player1 ? SquareType.Player1 : SquareType.Player2;
+		g.SetSquare(row, col, new Square(type));
 	}
 
 	private bool HandleKeyboardInput() {

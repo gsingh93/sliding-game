@@ -70,7 +70,6 @@ public class Grid : MonoBehaviour {
 			i--;
 			return new Pair<int, int>(row + stepY * i, col + stepX * i);
 		}
-
 	}
 
 	public void Print() {
