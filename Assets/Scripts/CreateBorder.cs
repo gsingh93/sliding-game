@@ -24,6 +24,16 @@ public class CreateBorder : MonoBehaviour {
 		// Left column
 		CreateRow(dim - 2, i => PlaceBlock(g, i + 1, dim - 1));
 
+		for (int i = 0; i < 5; i++) {
+			Vector3 coord = PlaceBlock(g, 4, i * 2 + 1);
+			CreateBlock(coord);
+		}
+
+		for (int i = 0; i < 5; i++) {
+			Vector3 coord = PlaceBlock(g, 7, i * 2 + 2);
+			CreateBlock(coord);
+		}
+
 //		System.Random r = new System.Random();
 //		for (int i = 0; i < 5; i++) {
 //			Vector3 coord = PlaceBlock(g, r.Next(dim - 2) + 1, r.Next(dim - 2) + 1);

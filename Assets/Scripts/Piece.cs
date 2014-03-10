@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using Direction = Grid.Direction;
 using Square = Grid.Square;
 using SquareType = Grid.SquareType;
+using PlayerEnum = Player.PlayerEnum;
+using Keymap = Player.Keymap;
 
 public class Piece : MonoBehaviour {
 
-	public PlayerEnum player;
 	private static PlayerEnum turn = PlayerEnum.Player1;
-	public enum PlayerEnum {
-		Player1, Player2
-	}
 	
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
@@ -54,14 +52,17 @@ public class Piece : MonoBehaviour {
 	private Piece pieceToDestroy;
 	private Player parent;
 
+	private static Keymap keymap;
+
 	private void Start() {
 		parent = transform.parent.GetComponent<Player>();
+		keymap = Player.keymap1;
 		g = GameObject.Find("Board").GetComponent<Grid>();
 		UpdatePosition();
 	}
 	
 	private void OnMouseDown() {
-		if (turn == player) {
+		if (turn == parent.player) {
 			isActive = true;
 		}
 	}
@@ -73,7 +74,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (!isActive || turn != player) {
+		if (!isActive || turn != parent.player) {
 			return;
 		}
 
@@ -82,7 +83,8 @@ public class Piece : MonoBehaviour {
 			if (moving == false) {
 				drawArrows = true;
 				state = State.Stationary;
-				turn = player == PlayerEnum.Player1 ? PlayerEnum.Player2 : PlayerEnum.Player1;
+				keymap = parent.opponentKeymap;
+				turn = parent.opponent;
 				if (pieceToDestroy != null) {
 					pieceToDestroy.Destroy();
 				}
@@ -112,27 +114,27 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void ChangePosition(int r, int c) {
-		string opponentName = player == PlayerEnum.Player1 ? "Player1" : "Player2";
+		string opponentName = parent.opponent.ToString();
 		Player p = GameObject.Find(opponentName).GetComponent<Player>();
 		p.pieceMap.Remove(new Pair<int, int>(row, col));
 		
 		g.SetSquare(row, col, new Square(SquareType.Empty));
 		row = r;
 		col = c;
-		SquareType type = player == PlayerEnum.Player1 ? SquareType.Player1 : SquareType.Player2;
+		SquareType type = parent.squareType;
 		g.SetSquare(row, col, new Square(type));
 		p.pieceMap.Add(new Pair<int, int>(row, col), this);
 	}
 
 	private bool HandleKeyboardInput() {
 		Direction dir;
-		if (Input.GetKeyDown(KeyCode.A)) {
+		if (Input.GetKeyDown(keymap.Left)) {
 			dir = Direction.Left;
-		} else if (Input.GetKeyDown(KeyCode.D)) {
+		} else if (Input.GetKeyDown(keymap.Right)) {
 			dir = Direction.Right;
-		} else if (Input.GetKeyDown(KeyCode.W)) {
+		} else if (Input.GetKeyDown(keymap.Up)) {
 			dir = Direction.Up;
-		} else if (Input.GetKeyDown(KeyCode.S)) {
+		} else if (Input.GetKeyDown(keymap.Down)) {
 			dir = Direction.Down;
 		} else {
 			return false;
@@ -144,10 +146,9 @@ public class Piece : MonoBehaviour {
 		}
 		ChangePosition(p.First, p.Second);
 
-		SquareType type = player == PlayerEnum.Player1 ? SquareType.Player2 : SquareType.Player1;
-		Pair<int, int> enemyPos = g.EnemyPosition(dir, row, col, type);
+		Pair<int, int> enemyPos = g.EnemyPosition(dir, row, col, parent.opponentSquareType);
 		if (enemyPos != null) {
-			string opponentName = player == PlayerEnum.Player1 ? "Player2" : "Player1";
+			string opponentName = parent.opponent.ToString();
 			Player opponent = GameObject.Find(opponentName).GetComponent<Player>();
 
 			Piece enemyPiece;
