@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 using Direction = Grid.Direction;
 using Square = Grid.Square;
@@ -7,12 +8,12 @@ using SquareType = Grid.SquareType;
 
 public class Piece : MonoBehaviour {
 
-	public Player player;
-	private static Player turn = Player.Player1;
-	public enum Player {
+	public PlayerEnum player;
+	private static PlayerEnum turn = PlayerEnum.Player1;
+	public enum PlayerEnum {
 		Player1, Player2
 	}
-
+	
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
 	public GameObject leftArrowPrefab;
@@ -50,11 +51,12 @@ public class Piece : MonoBehaviour {
 	private int row, col;
 
 	private Grid g;
-	private Piece[] pieces;
+	private Piece pieceToDestroy;
+	private Player parent;
 
 	private void Start() {
+		parent = transform.parent.GetComponent<Player>();
 		g = GameObject.Find("Board").GetComponent<Grid>();
-		pieces = transform.parent.GetComponentsInChildren<Piece>();
 		UpdatePosition();
 	}
 	
@@ -65,7 +67,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void SetAllInactive() {
-		foreach (Piece p in pieces) {
+		foreach (Piece p in parent.pieces) {
 			p.isActive = false;
 		}
 	}
@@ -80,7 +82,10 @@ public class Piece : MonoBehaviour {
 			if (moving == false) {
 				drawArrows = true;
 				state = State.Stationary;
-				turn = player == Player.Player1 ? Player.Player2 : Player.Player1;
+				turn = player == PlayerEnum.Player1 ? PlayerEnum.Player2 : PlayerEnum.Player1;
+				if (pieceToDestroy != null) {
+					pieceToDestroy.Destroy();
+				}
 				Camera.main.audio.Stop();
 			}
 			break;
@@ -107,11 +112,16 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void ChangePosition(int r, int c) {
+		string opponentName = player == PlayerEnum.Player1 ? "Player1" : "Player2";
+		Player p = GameObject.Find(opponentName).GetComponent<Player>();
+		p.pieceMap.Remove(new Pair<int, int>(row, col));
+		
 		g.SetSquare(row, col, new Square(SquareType.Empty));
 		row = r;
 		col = c;
-		SquareType type = player == Player.Player1 ? SquareType.Player1 : SquareType.Player2;
+		SquareType type = player == PlayerEnum.Player1 ? SquareType.Player1 : SquareType.Player2;
 		g.SetSquare(row, col, new Square(type));
+		p.pieceMap.Add(new Pair<int, int>(row, col), this);
 	}
 
 	private bool HandleKeyboardInput() {
@@ -132,8 +142,21 @@ public class Piece : MonoBehaviour {
 		if (p == null) {
 			return false;
 		}
-
 		ChangePosition(p.First, p.Second);
+
+		SquareType type = player == PlayerEnum.Player1 ? SquareType.Player2 : SquareType.Player1;
+		Pair<int, int> enemyPos = g.EnemyPosition(dir, row, col, type);
+		if (enemyPos != null) {
+			string opponentName = player == PlayerEnum.Player1 ? "Player2" : "Player1";
+			Player opponent = GameObject.Find(opponentName).GetComponent<Player>();
+
+			Piece enemyPiece;
+			opponent.pieceMap.TryGetValue(enemyPos, out enemyPiece);
+			DebugUtils.Assert(enemyPiece != null);
+			pieceToDestroy = enemyPiece;
+			opponent.pieceMap.Remove(enemyPos);
+			g.Clear(enemyPos);
+		}
 
 		StartCoroutine(move(g.PosToCoord(row, col)));
 		
@@ -183,5 +206,10 @@ public class Piece : MonoBehaviour {
 		transform.position = to;
 
 		moving = false;
+	}
+
+	public void Destroy() {
+		parent.pieces.Remove(this);
+		Destroy(gameObject);
 	}
 }

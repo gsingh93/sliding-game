@@ -21,6 +21,10 @@ public class Grid : MonoBehaviour {
 	public enum Direction {
 		Up, Down, Left, Right
 	}
+
+	private Pair<int, int>[] directionOffsets = { 
+		new Pair<int, int>(0, 1), new Pair<int, int>(0, -1), // Up, Down
+		new Pair<int, int>(-1, 0), new Pair<int, int>(1, 0) }; // Left, Right
 	
 	private Square[,] grid;
 
@@ -38,37 +42,17 @@ public class Grid : MonoBehaviour {
 	}
 
 	public Pair<int, int> FindOpenSquare(Direction dir, int row, int col) {
-		int stepX = 0;
-		int stepY = 0;
-
-		// TODO
-		switch (dir) {
-		case Direction.Up:
-			stepX = 0;
-			stepY = 1;
-			break;
-		case Direction.Down:
-			stepX = 0;
-			stepY = -1;
-			break;
-		case Direction.Left:
-			stepX = -1;
-			stepY = 0;
-			break;
-		case Direction.Right:
-			stepX = 1;
-			stepY = 0;
-			break;
-		}
+		int stepC = directionOffsets[(int) dir].First;
+		int stepR = directionOffsets[(int) dir].Second;
 
 		int i;
-		for (i = 1; IsEmpty(row + stepY * i, col + stepX * i); i++) {}
+		for (i = 1; IsEmpty(row + stepR * i, col + stepC * i); i++) {}
 
 		if (i == 1) {
 			return null;
 		} else {
 			i--;
-			return new Pair<int, int>(row + stepY * i, col + stepX * i);
+			return new Pair<int, int>(row + stepR * i, col + stepC * i);
 		}
 	}
 
@@ -101,6 +85,21 @@ public class Grid : MonoBehaviour {
 		BoundsCheck(row, col);
 
 		grid[row, col] = square;
+	}
+
+	public Pair<int, int> EnemyPosition(Direction dir, int row, int col, SquareType player) {
+		int stepC = directionOffsets[(int) dir].First;
+		int stepR = directionOffsets[(int) dir].Second;
+		
+		if (grid[row + stepR, col + stepC].type == player) {
+			return new Pair<int, int>(row + stepR, col + stepC);
+		} else {
+			return null;
+		}
+	}
+
+	public void Clear(Pair<int, int> pos) {
+		grid[pos.First, pos.Second] = new Square(SquareType.Empty);
 	}
 
 	public bool IsEmpty(int row, int col) {
