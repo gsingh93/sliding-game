@@ -119,16 +119,15 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void ChangePosition(int r, int c) {
-		opponent.pieceMap.Remove(new Pair<int, int>(row, col));
-
 		if (row != 0 && col != 0) { // Unset
+			DebugUtils.Assert(parent.pieceMap.Remove(new Pair<int, int>(row, col)));
 			g.SetSquare(row, col, new Square(SquareType.Empty));
 		}
 		row = r;
 		col = c;
 		SquareType type = parent.squareType;
 		g.SetSquare(row, col, new Square(type));
-		opponent.pieceMap.Add(new Pair<int, int>(row, col), this);
+		parent.pieceMap.Add(new Pair<int, int>(row, col), this);
 	}
 
 	private bool HandleKeyboardInput() {
@@ -157,7 +156,7 @@ public class Piece : MonoBehaviour {
 			opponent.pieceMap.TryGetValue(enemyPos, out enemyPiece);
 			DebugUtils.Assert(enemyPiece != null);
 			pieceToDestroy = enemyPiece;
-			opponent.pieceMap.Remove(enemyPos);
+			DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
 			g.Clear(enemyPos);
 		}
 
@@ -212,7 +211,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	public void Destroy() {
-		parent.pieces.Remove(this);
+		DebugUtils.Assert(parent.pieces.Remove(this));
 		Destroy(gameObject);
 	}
 }
