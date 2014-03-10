@@ -120,8 +120,10 @@ public class Piece : MonoBehaviour {
 
 	private void ChangePosition(int r, int c) {
 		opponent.pieceMap.Remove(new Pair<int, int>(row, col));
-		
-		g.SetSquare(row, col, new Square(SquareType.Empty));
+
+		if (row != 0 && col != 0) { // Unset
+			g.SetSquare(row, col, new Square(SquareType.Empty));
+		}
 		row = r;
 		col = c;
 		SquareType type = parent.squareType;
