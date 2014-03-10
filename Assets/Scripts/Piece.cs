@@ -51,13 +51,18 @@ public class Piece : MonoBehaviour {
 	private Grid g;
 	private Piece pieceToDestroy;
 	private Player parent;
+	private Player opponent;
 
 	private static Keymap keymap;
 
 	private void Start() {
-		parent = transform.parent.GetComponent<Player>();
-		keymap = Player.keymap1;
 		g = GameObject.Find("Board").GetComponent<Grid>();
+		parent = transform.parent.GetComponent<Player>();
+
+		string opponentName = parent.opponent.ToString();
+		opponent = GameObject.Find(opponentName).GetComponent<Player>();
+
+		keymap = Player.keymap1;
 		UpdatePosition();
 	}
 	
@@ -114,16 +119,14 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void ChangePosition(int r, int c) {
-		string opponentName = parent.opponent.ToString();
-		Player p = GameObject.Find(opponentName).GetComponent<Player>();
-		p.pieceMap.Remove(new Pair<int, int>(row, col));
+		opponent.pieceMap.Remove(new Pair<int, int>(row, col));
 		
 		g.SetSquare(row, col, new Square(SquareType.Empty));
 		row = r;
 		col = c;
 		SquareType type = parent.squareType;
 		g.SetSquare(row, col, new Square(type));
-		p.pieceMap.Add(new Pair<int, int>(row, col), this);
+		opponent.pieceMap.Add(new Pair<int, int>(row, col), this);
 	}
 
 	private bool HandleKeyboardInput() {
@@ -148,9 +151,6 @@ public class Piece : MonoBehaviour {
 
 		Pair<int, int> enemyPos = g.EnemyPosition(dir, row, col, parent.opponentSquareType);
 		if (enemyPos != null) {
-			string opponentName = parent.opponent.ToString();
-			Player opponent = GameObject.Find(opponentName).GetComponent<Player>();
-
 			Piece enemyPiece;
 			opponent.pieceMap.TryGetValue(enemyPos, out enemyPiece);
 			DebugUtils.Assert(enemyPiece != null);
