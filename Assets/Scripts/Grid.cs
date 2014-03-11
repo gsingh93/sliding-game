@@ -87,15 +87,18 @@ public class Grid : MonoBehaviour {
 		grid[row, col] = square;
 	}
 
-	public Pair<int, int> EnemyPosition(Direction dir, int row, int col, SquareType player) {
-		int stepC = directionOffsets[(int) dir].First;
-		int stepR = directionOffsets[(int) dir].Second;
-		
-		if (grid[row + stepR, col + stepC].type == player) {
-			return new Pair<int, int>(row + stepR, col + stepC);
-		} else {
+	public Pair<SquareType, Pair<int, int>> SquareTypeAt(Direction dir, int row, int col) {
+		if (!InBounds(row, col)) {
 			return null;
 		}
+
+		int stepC = directionOffsets[(int) dir].First;
+		int stepR = directionOffsets[(int) dir].Second;
+		int r = row + stepR;
+		int c = col + stepC;
+
+		Pair<int, int> pos = new Pair<int, int>(r, c);
+		return new Pair<SquareType, Pair<int, int>>(grid[r, c].type, pos);
 	}
 
 	public void Clear(Pair<int, int> pos) {

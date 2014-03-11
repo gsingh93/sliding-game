@@ -9,7 +9,7 @@ using PlayerEnum = Player.PlayerEnum;
 using Keymap = Player.Keymap;
 
 public class Piece : MonoBehaviour {
-
+	
 	private static PlayerEnum turn = PlayerEnum.Player1;
 	
 	public GameObject upArrowPrefab;
@@ -55,7 +55,10 @@ public class Piece : MonoBehaviour {
 
 	private static Keymap keymap;
 
+	private GameState gameState;
+
 	private void Start() {
+		gameState = GameState.Create();
 		g = GameObject.Find("Board").GetComponent<Grid>();
 		parent = transform.parent.GetComponent<Player>();
 
@@ -150,14 +153,20 @@ public class Piece : MonoBehaviour {
 		}
 		ChangePosition(p.First, p.Second);
 
-		Pair<int, int> enemyPos = g.EnemyPosition(dir, row, col, parent.opponentSquareType);
-		if (enemyPos != null) {
-			Piece enemyPiece;
-			opponent.pieceMap.TryGetValue(enemyPos, out enemyPiece);
-			DebugUtils.Assert(enemyPiece != null);
-			pieceToDestroy = enemyPiece;
-			DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
-			g.Clear(enemyPos);
+		// Check if the square behind the spot moved to is an enemy
+		Pair<SquareType, Pair<int, int>> type = g.SquareTypeAt(dir, row, col);
+		if (type != null && type.First == parent.opponentSquareType) {
+			Pair<int, int> enemyPos = type.Second;
+			Pair<SquareType, Pair<int, int>> backingSquare = g.SquareTypeAt(dir, enemyPos.First, enemyPos.Second);
+			// Check if the square behind the enemy isn't empty if backing is enabled
+			if (gameState.enableBacking == false || (backingSquare != null && backingSquare.First != SquareType.Empty)) {
+				Piece enemyPiece;
+				opponent.pieceMap.TryGetValue(enemyPos, out enemyPiece);
+				DebugUtils.Assert(enemyPiece != null);
+				pieceToDestroy = enemyPiece;
+				DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
+				g.Clear(enemyPos);
+			}
 		}
 
 		StartCoroutine(move(g.PosToCoord(row, col)));
