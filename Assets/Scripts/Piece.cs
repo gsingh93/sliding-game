@@ -167,6 +167,9 @@ public class Piece : MonoBehaviour {
 				DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
 				g.Clear(enemyPos);
 			}
+			if (gameState.takeEnemySpot) {
+				ChangePosition(enemyPos.First, enemyPos.Second);
+			}
 		}
 
 		StartCoroutine(move(g.PosToCoord(row, col)));
