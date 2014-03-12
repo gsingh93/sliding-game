@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MenuButton : MonoBehaviour {
 	public enum Button {
-		Play, Help
+		PlayMulti, PlayComp, Options, Help
 	}
 	public Button button;
 
@@ -18,9 +18,13 @@ public class MenuButton : MonoBehaviour {
 	}
 
 	private void OnMouseDown() {
+		audio.Play();
 		switch(button) {
-		case Button.Play:
+		case Button.PlayMulti:
+			Application.LoadLevel("Board");
 			break;
+		case Button.PlayComp:
+		case Button.Options:
 		case Button.Help:
 			break;
 		}
