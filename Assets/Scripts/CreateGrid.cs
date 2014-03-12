@@ -79,14 +79,14 @@ public class CreateGrid : MonoBehaviour {
 
 		// Vertical lines
 		for (int i = 1; i < dim; i++) {
-			GL.Vertex3(i - dimF/2, -1 * dimF/2, -1);
-			GL.Vertex3(i - dimF/2, dimF/2, -1);
+			GL.Vertex3(i - dimF/2, -1 * dimF/2, -2);
+			GL.Vertex3(i - dimF/2, dimF/2, -2);
 		}
 
 		// Horizontal lines
 		for (int i = 1; i < dim; i++) {
-			GL.Vertex3(-1 * dimF/2, i - dimF/2, -1);
-			GL.Vertex3(dimF/2, i - dimF/2, -1);
+			GL.Vertex3(-1 * dimF/2, i - dimF/2, -2);
+			GL.Vertex3(dimF/2, i - dimF/2, -2);
 		}
 
 		GL.PopMatrix();
