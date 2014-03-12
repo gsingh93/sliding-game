@@ -16,18 +16,22 @@ public class CreateGrid : MonoBehaviour {
 	private Grid g;
 
 	private Pair<int, int>[] blocks = {
-		new Pair<int, int>(5, 1),
-		new Pair<int, int>(7, 1),
-		new Pair<int, int>(3, 2),
+		new Pair<int, int>(4, 1),
+		new Pair<int, int>(10, 1),
+		new Pair<int, int>(6, 2),
+		new Pair<int, int>(8, 3),
+		new Pair<int, int>(3, 4),
+		new Pair<int, int>(7, 5),
+		new Pair<int, int>(5, 6),
+		new Pair<int, int>(9, 7),
+		new Pair<int, int>(4, 8),
 		new Pair<int, int>(8, 9),
-		new Pair<int, int>(7, 4),
-		new Pair<int, int>(3, 8),
-		new Pair<int, int>(5, 5),
-		new Pair<int, int>(7, 1),
-		new Pair<int, int>(8, 5),
-		new Pair<int, int>(5, 9),
-		new Pair<int, int>(7, 10),
-		new Pair<int, int>(3, 3)};
+		new Pair<int, int>(11, 10),
+		new Pair<int, int>(5, 11),
+		new Pair<int, int>(7, 12),
+		new Pair<int, int>(4, 13),
+		new Pair<int, int>(10, 13),
+	};
 
 	void Start() {
 		board = GameObject.Find("Board");
