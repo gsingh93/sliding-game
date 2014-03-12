@@ -4,7 +4,7 @@ using System.Text;
 
 public class Grid : MonoBehaviour {
 
-	public const int Dim = 13;
+	public const int Dim = 15;
 
 	private const float magicConst = (Dim - 1) / 2;
 

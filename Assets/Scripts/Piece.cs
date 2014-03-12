@@ -61,15 +61,14 @@ public class Piece : MonoBehaviour {
 		gameState = GameState.Create();
 		g = GameObject.Find("Board").GetComponent<Grid>();
 		parent = transform.parent.GetComponent<Player>();
+		DebugUtils.Assert(parent);
 
 		string opponentName = parent.opponent.ToString();
 		opponent = GameObject.Find(opponentName).GetComponent<Player>();
+		DebugUtils.Assert(opponent);
 
 		keymap = Player.keymap1;
 		UpdatePosition();
-
-		DebugUtils.Assert(parent);
-		DebugUtils.Assert(opponent);
 	}
 	
 	private void OnMouseDown() {
