@@ -22,12 +22,14 @@ public class Player : MonoBehaviour {
 		public KeyCode Right;
 		public KeyCode Up;
 		public KeyCode Down;
+		public KeyCode Cycle;
 		
-		public Keymap(KeyCode l, KeyCode r, KeyCode u, KeyCode d) {
+		public Keymap(KeyCode l, KeyCode r, KeyCode u, KeyCode d, KeyCode c) {
 			Left = l;
 			Right = r;
 			Up = u;
 			Down = d;
+			Cycle = c;
 		}
 	}
 
@@ -37,10 +39,11 @@ public class Player : MonoBehaviour {
 	public Dictionary<Pair<int, int>, Piece> pieceMap = new Dictionary<Pair<int, int>, Piece>();
 	public HashSet<Piece> pieces;
 
-	public static Keymap keymap1 = new Keymap(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S);
-	public static Keymap keymap2 = new Keymap(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow);
+	public static Keymap keymap1 = new Keymap(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.Tab);
+	public static Keymap keymap2 = new Keymap(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow,
+	                                          KeyCode.KeypadEnter);
 
-	void Start() {
+	private void Start() {
 		Material material;
 		if (player == PlayerEnum.Player1) {
 			opponent = PlayerEnum.Player2;
@@ -61,6 +64,43 @@ public class Player : MonoBehaviour {
 		pieces = new HashSet<Piece>(GetComponentsInChildren<Piece>());
 		foreach (Piece p in pieces) {
 			p.renderer.material = material;
+		}
+	}
+
+	private void Update() {
+		if (Piece.turn != player) {
+			return;
+		}
+
+		if (Input.GetKeyDown(keymap.Cycle)) {
+			UpdateActive();
+		}
+	}
+
+	private void UpdateActive() {
+		bool first = true;
+		bool found = false;
+		Piece newActive = null;
+		Piece firstPiece = null;
+		foreach (Piece p in pieces) {
+			if (first) {
+				firstPiece = p;
+				first = false;
+			}
+			if (found) {
+				newActive = p;
+				break;
+			}
+			if (p.isActive) {
+				found = true;
+			}
+		}
+
+		if (found) {
+			if (newActive == null) {
+				newActive = firstPiece;
+			}
+			newActive.isActive = true;
 		}
 	}
 }

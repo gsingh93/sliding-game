@@ -10,7 +10,7 @@ using Keymap = Player.Keymap;
 
 public class Piece : MonoBehaviour {
 	
-	private static PlayerEnum turn = PlayerEnum.Player1;
+	public static PlayerEnum turn = PlayerEnum.Player1;
 	
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
@@ -20,7 +20,7 @@ public class Piece : MonoBehaviour {
 	private float speed = 0.2f;
 
 	private bool _isActive = false;
-	private bool isActive {
+	public bool isActive {
 		get { return _isActive; }
 		set {
 			if (value) {
