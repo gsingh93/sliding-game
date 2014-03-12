@@ -2,7 +2,10 @@ fileFormatVersion: 2
 guid: dac6e4f254b7a6e458c5079a7b2001e9
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - piecePrefab: {fileID: 11400000, guid: 16bcb3d8247009b4d888d47a1786295e, type: 2}
+  - mat1: {fileID: 2100000, guid: 71eb1b2e4a3d18948aacfad701aed0cb, type: 2}
+  - mat2: {fileID: 2100000, guid: 3f37c5768dbc211429ddc0b283889e18, type: 2}
   executionOrder: 100
   icon: {instanceID: 0}
   userData: 

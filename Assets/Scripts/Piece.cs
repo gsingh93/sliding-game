@@ -67,6 +67,9 @@ public class Piece : MonoBehaviour {
 
 		keymap = Player.keymap1;
 		UpdatePosition();
+
+		DebugUtils.Assert(parent);
+		DebugUtils.Assert(opponent);
 	}
 	
 	private void OnMouseDown() {

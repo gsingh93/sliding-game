@@ -4,7 +4,9 @@ using System.Text;
 
 public class Grid : MonoBehaviour {
 
-	public const int Dim = 12;
+	public const int Dim = 13;
+
+	private const float magicConst = (Dim - 1) / 2;
 
 	public enum SquareType {
 		Empty, Block, Player1, Player2, Coin
@@ -114,12 +116,12 @@ public class Grid : MonoBehaviour {
 	public Vector3 PosToCoord(int row, int col) {
 		BoundsCheck(row, col);
 
-		return new Vector3(-5.5f + col, -5.5f + row, -1);
+		return new Vector3(-1 * magicConst + col, -1 * magicConst + row, -1);
 	}
 
 	public Pair<int, int> CoordToPos(Vector3 coord) {
-		int row = (int) (coord.y + 5.5f);
-		int col = (int) (coord.x + 5.5f);
+		int row = (int) (coord.y + magicConst);
+		int col = (int) (coord.x + magicConst);
 
 		BoundsCheck(row, col);
 
