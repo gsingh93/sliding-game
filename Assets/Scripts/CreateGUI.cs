@@ -14,11 +14,14 @@ public class CreateGUI : MonoBehaviour {
 		DebugUtils.Assert(player1);
 		DebugUtils.Assert(player2);
 
-		displayInfo(player1, 60, 50);
-		displayInfo(player2, 700, 50);
+		displayInfo(player1, 8, 7);
+		displayInfo(player2, 84, 7);
 	}
 
-	private void displayInfo(Player player, int x, int y) {
+	private void displayInfo(Player player, int xPercent, int yPercent) {
+		float x = xPercent * Screen.width / 100;
+		float y = yPercent * Screen.height / 100;
+
 		string playerName;
 		int piecesRemaining = player.pieces.Count;
 		if (player.player == PlayerEnum.Player1) {
