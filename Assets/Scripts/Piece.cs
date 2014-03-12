@@ -168,9 +168,10 @@ public class Piece : MonoBehaviour {
 				pieceToDestroy = enemyPiece;
 				DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
 				g.Clear(enemyPos);
-			}
-			if (gameState.takeEnemySpot) {
-				ChangePosition(enemyPos.First, enemyPos.Second);
+
+				if (gameState.takeEnemySpot) {
+					ChangePosition(enemyPos.First, enemyPos.Second);
+				}
 			}
 		}
 
