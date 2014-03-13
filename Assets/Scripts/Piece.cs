@@ -11,7 +11,9 @@ using Keymap = Player.Keymap;
 public class Piece : MonoBehaviour {
 	
 	public static PlayerEnum turn = PlayerEnum.Player1;
-	
+
+	public GameObject trailBlockPrefab;
+
 	public GameObject upArrowPrefab;
 	public GameObject downArrowPrefab;
 	public GameObject leftArrowPrefab;
@@ -95,6 +97,7 @@ public class Piece : MonoBehaviour {
 				state = State.Stationary;
 				keymap = parent.opponentKeymap;
 				turn = parent.opponent;
+				UpdateTrails();
 				if (pieceToDestroy != null) {
 					pieceToDestroy.Destroy();
 				}
@@ -118,15 +121,119 @@ public class Piece : MonoBehaviour {
 		}
 	}
 
+	private void UpdateTrails() {
+		for (int i = trails.Count - 1; i >= 0; i--) {
+			trails[i].TurnPassed();
+			if (trails[i].finished) {
+				trails.RemoveAt(i);
+			}
+		}
+	}
+
 	private void UpdatePosition() {
 		Pair<int, int> p = g.CoordToPos(transform.position);
 		ChangePosition(p.First, p.Second);
+	}
+
+	// TODO: Overlapping trails
+	class Trail {
+		private Grid g;
+
+		private List<Pair<int, int>> coords = new List<Pair<int, int>>();
+		private List<Square> squares = new List<Square>();
+		private List<GameObject> blocks = new List<GameObject>();
+
+		public bool finished = false;
+
+		public Trail(Grid g) {
+			this.g = g;
+		}
+
+		public void Add(Pair<int, int> coord, Square square, GameObject block) {
+			coords.Add(coord);
+			squares.Add(square);
+			blocks.Add(block);
+		}
+
+		public void TurnPassed() {
+			for (int i = coords.Count - 1; i >= 0; i--) {
+				squares[i].turnsRemaining--;
+				if (squares[i].turnsRemaining == 0) {
+					finished = true;
+					GameObject b = blocks[i];
+					blocks.RemoveAt(i);
+					Destroy(b);
+					g.SetSquare(coords[i].First, coords[i].Second, new Square(SquareType.Empty));
+				}
+			}
+		}
+	}
+
+	static void Swap<T>(ref T lhs, ref T rhs) {
+		T temp;
+		temp = lhs;
+		lhs = rhs;
+		rhs = temp;
+	}
+
+	private static List<Trail> trails = new List<Trail>();
+
+	// TODO: Combine if clauses
+	private void AddTrail(int r1, int c1, int r2, int c2) {
+		Trail t = new Trail(g);
+		if (c1 == c2) {
+			if (r1 > r2) {
+				Swap<int>(ref r1, ref r2);
+				r1++;
+				r2++;
+			}
+			for (int i = r1; i < r2; i++) {
+				Square s = new Square(parent.trailType);
+				s.turnsRemaining = 3;
+
+				Pair<int, int> pos = new Pair<int, int>(i, c1);
+				Vector3 coord = g.PosToCoord(i, c1);
+				GameObject block = PlaceTrailBlock(coord);
+				t.Add(pos, s, block);
+
+				g.SetSquare(i, c1, s);
+			}
+		} else {
+			DebugUtils.Assert(r1 == r2);
+			if (c1 > c2) {
+				Swap<int>(ref c1, ref c2);
+				c1++;
+				c2++;
+			}
+			for (int i = c1; i < c2; i++) {
+				Square s = new Square(parent.trailType);
+				s.turnsRemaining = 2;
+
+				Pair<int, int> pos = new Pair<int, int>(r1, i);
+				Vector3 coord = g.PosToCoord(r1, i);
+				GameObject block = PlaceTrailBlock(coord);
+				t.Add(pos, s, block);
+
+				g.SetSquare(r1, i, s);
+			}
+		}
+
+		trails.Add(t);
+	}
+
+	GameObject PlaceTrailBlock(Vector3 position) {
+		GameObject block = Instantiate(trailBlockPrefab) as GameObject;
+		block.transform.position = position;
+		block.renderer.material.color = parent.trailColor;
+		return block;
+		//block.transform.parent = t.transform;
 	}
 
 	private void ChangePosition(int r, int c) {
 		if (row != 0 && col != 0) { // Unset
 			DebugUtils.Assert(parent.pieceMap.Remove(new Pair<int, int>(row, col)));
 			g.SetSquare(row, col, new Square(SquareType.Empty));
+			AddTrail(row, col, r, c);
 		}
 		row = r;
 		col = c;

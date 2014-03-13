@@ -9,11 +9,12 @@ public class Grid : MonoBehaviour {
 	private const float magicConst = (Dim - 1) / 2;
 
 	public enum SquareType {
-		Empty, Block, Player1, Player2, Coin
+		Empty, Block, Player1, Player2, Trail1, Trail2, Coin 
 	}
 
 	public class Square {
 		public SquareType type;
+		public int turnsRemaining;
 
 		public Square(SquareType type) {
 			this.type = type;
@@ -75,6 +76,12 @@ public class Grid : MonoBehaviour {
 				case SquareType.Player2:
 					sb.Append("2");
 					break;
+				case SquareType.Trail1:
+					sb.Append("T");
+					break;
+				case SquareType.Trail2:
+					sb.Append("t");
+					break;
 				}
 			}
 			sb.AppendLine("");
@@ -107,10 +114,12 @@ public class Grid : MonoBehaviour {
 		grid[pos.First, pos.Second] = new Square(SquareType.Empty);
 	}
 
+	// TODO: Fix hack
 	public bool IsEmpty(int row, int col) {
 		BoundsCheck(row, col);
 
-		return grid[row, col].type == SquareType.Empty;
+		SquareType t = grid[row, col].type;
+		return t == SquareType.Empty || t == SquareType.Trail1 || t == SquareType.Trail2;
 	}
 
 	public Vector3 PosToCoord(int row, int col) {

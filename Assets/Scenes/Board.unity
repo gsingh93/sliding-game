@@ -213,6 +213,9 @@ MonoBehaviour:
   opponent: 0
   squareType: 0
   opponentSquareType: 0
+  trailType: 0
+  opponentTrailType: 0
+  trailColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1400870082
 GameObject:
   m_ObjectHideFlags: 0
@@ -651,3 +654,6 @@ MonoBehaviour:
   opponent: 0
   squareType: 0
   opponentSquareType: 0
+  trailType: 0
+  opponentTrailType: 0
+  trailColor: {r: 0, g: 0, b: 0, a: 0}

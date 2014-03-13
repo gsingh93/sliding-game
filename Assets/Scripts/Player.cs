@@ -35,7 +35,11 @@ public class Player : MonoBehaviour {
 
 	public SquareType squareType;
 	public SquareType opponentSquareType;
+	public SquareType trailType;
+	public SquareType opponentTrailType;
 
+	public Color trailColor;
+	
 	public Dictionary<Pair<int, int>, Piece> pieceMap = new Dictionary<Pair<int, int>, Piece>();
 	public HashSet<Piece> pieces;
 
@@ -52,6 +56,9 @@ public class Player : MonoBehaviour {
 			squareType = SquareType.Player1;
 			opponentSquareType = SquareType.Player2;
 			material = mat1;
+			trailType = SquareType.Trail1;
+			opponentTrailType = SquareType.Trail2;
+			trailColor = Color.red;
 		} else {
 			opponent = PlayerEnum.Player1;
 			keymap = keymap2;
@@ -59,6 +66,9 @@ public class Player : MonoBehaviour {
 			squareType = SquareType.Player2;
 			opponentSquareType = SquareType.Player1;
 			material = mat2;
+			trailType = SquareType.Trail2;
+			opponentTrailType = SquareType.Trail1;
+			trailColor = Color.blue;
 		}
 
 		pieces = new HashSet<Piece>(GetComponentsInChildren<Piece>());
