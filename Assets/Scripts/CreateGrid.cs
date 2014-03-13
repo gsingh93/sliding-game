@@ -122,12 +122,13 @@ public class CreateGrid : MonoBehaviour {
 		DebugUtils.Assert(player1);
 		DebugUtils.Assert(player2);
 
-		for (int i = 0; i < dim - 2; i++) {
+		int numPieces = dim - 2;
+		for (int i = 0; i < numPieces; i += 2) {
 			Vector3 coord = Place(g, 1, i + 1, SquareType.Player1);
 			CreatePiece(coord, player1);
 		}
 		
-		for (int i = 0; i < dim - 2; i++) {
+		for (int i = 0; i < numPieces; i += 2) {
 			Vector3 coord = Place(g, dim - 2, i + 1, SquareType.Player2);
 			CreatePiece(coord, player2);
 		}

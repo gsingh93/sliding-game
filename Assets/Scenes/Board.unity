@@ -253,7 +253,7 @@ AudioSource:
   serializedVersion: 3
   m_audioClip: {fileID: 8300000, guid: d714ecbc59c5b3a45b0b509fcdc4f03c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: .200000003
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -345,6 +345,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 684312e42289dbf48934a20deddeeccc, type: 2}
       propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8200000, guid: 684312e42289dbf48934a20deddeeccc, type: 2}
+      propertyPath: m_Volume
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
