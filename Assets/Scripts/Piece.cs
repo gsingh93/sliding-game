@@ -105,11 +105,11 @@ public class Piece : MonoBehaviour {
 				turn = parent.opponent;
 				UpdateTrails();
 				if (pieceToDestroy != null) {
-					pieceToDestroy.Destroy();
+					pieceToDestroy.DestroyPiece();
 				}
 				Camera.main.audio.Stop();
 				if (destroyThis) {
-					Destroy();
+					DestroyPiece();
 				}
 			}
 			break;
@@ -154,9 +154,11 @@ public class Piece : MonoBehaviour {
 		private List<GameObject> blocks = new List<GameObject>();
 
 		public bool finished = false;
+		public Piece owner;
 
-		public Trail(Grid g) {
+		public Trail(Grid g, Piece owner) {
 			this.g = g;
+			this.owner = owner;
 		}
 
 		public void Add(Pair<int, int> coord, Square square, GameObject block) {
@@ -170,12 +172,22 @@ public class Piece : MonoBehaviour {
 				squares[i].turnsRemaining--;
 				if (squares[i].turnsRemaining == 0) {
 					finished = true;
-					GameObject b = blocks[i];
-					blocks.RemoveAt(i);
-					Destroy(b);
-					g.SetSquare(coords[i].First, coords[i].Second, new Square(SquareType.Empty));
+					RemoveTrailBlock(i);
 				}
 			}
+		}
+
+		public void DestroyTrail() {
+			for (int i = coords.Count - 1; i >= 0; i--) {
+				RemoveTrailBlock(i);
+			}
+		}
+
+		public void RemoveTrailBlock(int index) {
+			GameObject b = blocks[index];
+			blocks.RemoveAt(index);
+			Destroy(b);
+			g.SetSquare(coords[index].First, coords[index].Second, new Square(SquareType.Empty));
 		}
 	}
 
@@ -304,7 +316,8 @@ public class Piece : MonoBehaviour {
 	private IEnumerator move(Vector3 to) {
 		moving = true;
 
-		Trail t = new Trail(g);
+		Trail t = new Trail(g, this);
+		trails.Add(t);
 
 		Vector3 velocity = speed * (to - transform.position).normalized;
 		Pair<int, int> lastPos = null;
@@ -334,12 +347,16 @@ public class Piece : MonoBehaviour {
 		}
 		transform.position = to;
 
-		trails.Add(t);
-
 		moving = false;
 	}
 
-	public void Destroy() {
+	public void DestroyPiece() {
+		for (int i = trails.Count - 1; i >= 0; i--) {
+			if (trails[i].owner == this) {
+				trails[i].DestroyTrail();
+				trails.RemoveAt(i);
+			}
+		}
 		DebugUtils.Assert(parent.pieces.Remove(this));
 		Destroy(gameObject);
 	}
