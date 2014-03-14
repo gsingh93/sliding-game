@@ -107,10 +107,14 @@ public class Player : MonoBehaviour {
 		}
 
 		if (found) {
+			// If the last piece is active, wrap around
 			if (newActive == null) {
 				newActive = firstPiece;
 			}
 			newActive.isActive = true;
+		} else {
+			// When no other piece is active, make the first piece active
+			firstPiece.isActive = true;
 		}
 	}
 }
