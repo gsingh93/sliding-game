@@ -237,13 +237,14 @@ public class Piece : MonoBehaviour {
 		if (p == null) {
 			return false;
 		}
-		int oldRow = row;
-		int oldCol = col;
-		ChangePosition(p.First, p.Second);
 
-		if (!LookForTrail(dir, oldRow, oldCol)) {
+		if (!LookForTrail(dir, row, col)) {
 			// Check if the square behind the spot moved to is an enemy
-			LookForEnemy(dir);
+			if (!LookForEnemy(dir, p.First, p.Second)) {
+				ChangePosition(p.First, p.Second);
+			}
+		} else {
+			ChangePosition(p.First, p.Second);
 		}
 
 		StartCoroutine(move(g.PosToCoord(row, col)));
@@ -260,7 +261,7 @@ public class Piece : MonoBehaviour {
 		return true;
 	}
 
-	private void LookForEnemy(Direction dir) {
+	private bool LookForEnemy(Direction dir, int row, int col) {
 		Pair<SquareType, Pair<int, int>> type = g.SquareTypeAt(dir, row, col);
 		if (type != null && type.First == parent.opponentSquareType) {
 			Pair<int, int> enemyPos = type.Second;
@@ -276,9 +277,15 @@ public class Piece : MonoBehaviour {
 				
 				if (gameState.takeEnemySpot) {
 					ChangePosition(enemyPos.First, enemyPos.Second);
+				} else {
+					ChangePosition(row, col);
 				}
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	private void CreateArrows() {
@@ -328,7 +335,7 @@ public class Piece : MonoBehaviour {
 				moving = false; // TODO: Hack
 				yield break;
 			}
-			if (lastPos != pos) {
+			if (lastPos != pos && !(pos.First == row && pos.Second == col)) {
 				Square s = new Square(parent.trailType);
 				s.turnsRemaining = 4;
 

@@ -59,8 +59,11 @@ public class Grid : MonoBehaviour {
 				found = true;
 				break;
 			}
+			if (grid[row, col].type != SquareType.Empty) {
+				break;
+			}
 		}
-		
+
 		if (!found) {
 			return null;
 		} else {
@@ -85,7 +88,7 @@ public class Grid : MonoBehaviour {
 
 	public void Print() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < Dim; i++) {
+		for (int i = Dim - 1; i >= 0; i--) {
 			for (int j = 0; j < Dim; j++) {
 				switch(grid[i, j].type) {
 				case SquareType.Empty:
@@ -157,8 +160,9 @@ public class Grid : MonoBehaviour {
 	}
 
 	public Pair<int, int> CoordToPos(Vector3 coord, bool boundsCheck) {
-		int row = (int) (coord.y + magicConst);
-		int col = (int) (coord.x + magicConst);
+		// The 0.5f is for rounding to the nearest int
+		int row = (int) (coord.y + magicConst + 0.5f);
+		int col = (int) (coord.x + magicConst + 0.5f);
 
 		if (boundsCheck) BoundsCheck(row, col);
 
