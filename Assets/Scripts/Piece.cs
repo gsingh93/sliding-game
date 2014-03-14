@@ -178,49 +178,6 @@ public class Piece : MonoBehaviour {
 
 	private static List<Trail> trails = new List<Trail>();
 
-	// TODO: Combine if clauses
-	private void AddTrail(int r1, int c1, int r2, int c2) {
-		Trail t = new Trail(g);
-		if (c1 == c2) {
-			if (r1 > r2) {
-				Swap<int>(ref r1, ref r2);
-				r1++;
-				r2++;
-			}
-			for (int i = r1; i < r2; i++) {
-				Square s = new Square(parent.trailType);
-				s.turnsRemaining = 3;
-
-				Pair<int, int> pos = new Pair<int, int>(i, c1);
-				Vector3 coord = g.PosToCoord(i, c1);
-				GameObject block = PlaceTrailBlock(coord);
-				t.Add(pos, s, block);
-
-				g.SetSquare(i, c1, s);
-			}
-		} else {
-			DebugUtils.Assert(r1 == r2);
-			if (c1 > c2) {
-				Swap<int>(ref c1, ref c2);
-				c1++;
-				c2++;
-			}
-			for (int i = c1; i < c2; i++) {
-				Square s = new Square(parent.trailType);
-				s.turnsRemaining = 2;
-
-				Pair<int, int> pos = new Pair<int, int>(r1, i);
-				Vector3 coord = g.PosToCoord(r1, i);
-				GameObject block = PlaceTrailBlock(coord);
-				t.Add(pos, s, block);
-
-				g.SetSquare(r1, i, s);
-			}
-		}
-
-		trails.Add(t);
-	}
-
 	GameObject PlaceTrailBlock(Vector3 position) {
 		GameObject block = Instantiate(trailBlockPrefab) as GameObject;
 		block.transform.position = position;
@@ -233,7 +190,7 @@ public class Piece : MonoBehaviour {
 		if (row != 0 && col != 0) { // Unset
 			DebugUtils.Assert(parent.pieceMap.Remove(new Pair<int, int>(row, col)));
 			g.SetSquare(row, col, new Square(SquareType.Empty));
-			AddTrail(row, col, r, c);
+			//AddTrail(row, col, r, c);
 		}
 		row = r;
 		col = c;
@@ -322,12 +279,32 @@ public class Piece : MonoBehaviour {
 	private IEnumerator move(Vector3 to) {
 		moving = true;
 
+		Trail t = new Trail(g);
+
 		Vector3 velocity = speed * (to - transform.position).normalized;
+		Pair<int, int> lastPos = null;
 		while (transform.position != to) {
+			Pair<int, int> pos = g.CoordToPos(transform.position, false);
+			if (lastPos != pos) {
+				Square s = new Square(parent.trailType);
+				s.turnsRemaining = 3;
+
+				Vector3 coord = g.PosToCoord(pos.First, pos.Second);
+				GameObject block = PlaceTrailBlock(coord);
+				t.Add(pos, s, block);
+
+				g.SetSquare(pos.First, pos.Second, s);
+
+				lastPos = pos;
+			}
+			// TODO: Why does this have to come after?
 			transform.position += velocity;
+
 			yield return null;
 		}
 		transform.position = to;
+
+		trails.Add(t);
 
 		moving = false;
 	}

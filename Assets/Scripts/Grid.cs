@@ -129,10 +129,14 @@ public class Grid : MonoBehaviour {
 	}
 
 	public Pair<int, int> CoordToPos(Vector3 coord) {
+		return CoordToPos(coord, true);
+	}
+
+	public Pair<int, int> CoordToPos(Vector3 coord, bool boundsCheck) {
 		int row = (int) (coord.y + magicConst);
 		int col = (int) (coord.x + magicConst);
 
-		BoundsCheck(row, col);
+		if (boundsCheck) BoundsCheck(row, col);
 
 		return new Pair<int, int>(row, col);
 	}
