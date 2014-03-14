@@ -39,6 +39,8 @@ public class Player : MonoBehaviour {
 	public SquareType opponentTrailType;
 
 	public Color trailColor;
+
+	public bool useAI = false;
 	
 	public Dictionary<Pair<int, int>, Piece> pieceMap = new Dictionary<Pair<int, int>, Piece>();
 	public HashSet<Piece> pieces;
@@ -69,6 +71,9 @@ public class Player : MonoBehaviour {
 			trailType = SquareType.Trail2;
 			opponentTrailType = SquareType.Trail1;
 			trailColor = Color.blue;
+
+			useAI = GameObject.Find("GameState").GetComponent<GameState>().useAI;
+			gameObject.AddComponent<AI>();
 		}
 
 		pieces = new HashSet<Piece>(GetComponentsInChildren<Piece>());

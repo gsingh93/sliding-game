@@ -6,6 +6,7 @@ public class GameState : MonoBehaviour {
 
 	public bool enableBacking = false;
 	public bool takeEnemySpot = false;
+	public bool useAI = false;
 
 	private void Awake() {
 		instance = this;

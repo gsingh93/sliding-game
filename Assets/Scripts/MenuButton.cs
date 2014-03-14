@@ -12,6 +12,7 @@ public class MenuButton : MonoBehaviour {
 		renderer.material.color = Color.red;
 	}
 
+	// TODO: Not always called
 	private void OnMouseExit() {
 		GetComponent<Animator>().Play("Shrink");
 		renderer.material.color = Color.white;
@@ -24,6 +25,9 @@ public class MenuButton : MonoBehaviour {
 			Application.LoadLevel("Board");
 			break;
 		case Button.PlayComp:
+			GameObject.Find("GameState").GetComponent<GameState>().useAI = true;
+			Application.LoadLevel("Board");
+			break;
 		case Button.Options:
 		case Button.Help:
 			break;
