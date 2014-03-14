@@ -44,6 +44,30 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
+	public Pair<int, int> FindEnemyTrail(Direction dir, int row, int col, SquareType type) {
+		int stepC = directionOffsets[(int) dir].First;
+		int stepR = directionOffsets[(int) dir].Second;
+		
+		bool found = false;
+		while (true) {
+			row += stepR;
+			col += stepC;
+			if (!InBounds(row, col)) {
+				break;
+			}
+			if(grid[row, col].type == type) {
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found) {
+			return null;
+		} else {
+			return new Pair<int, int>(row, col);
+		}
+	}
+
 	public Pair<int, int> FindOpenSquare(Direction dir, int row, int col) {
 		int stepC = directionOffsets[(int) dir].First;
 		int stepR = directionOffsets[(int) dir].Second;

@@ -11,6 +11,7 @@ using Keymap = Player.Keymap;
 public class Piece : MonoBehaviour {
 	
 	public static PlayerEnum turn = PlayerEnum.Player1;
+	private static List<Trail> trails = new List<Trail>();
 
 	public GameObject trailBlockPrefab;
 
@@ -45,6 +46,8 @@ public class Piece : MonoBehaviour {
 
 	private bool moving;
 
+	private Pair<int, int> trailLoc;
+
 	private int[] dr = {-1, 1, 0, 0};
 	private int[] dc = {0, 0, 1, -1};
 
@@ -54,6 +57,8 @@ public class Piece : MonoBehaviour {
 	private Piece pieceToDestroy;
 	private Player parent;
 	private Player opponent;
+
+	private bool destroyThis = false;
 
 	private static Keymap keymap;
 
@@ -103,6 +108,9 @@ public class Piece : MonoBehaviour {
 					pieceToDestroy.Destroy();
 				}
 				Camera.main.audio.Stop();
+				if (destroyThis) {
+					Destroy();
+				}
 			}
 			break;
 		case State.Stationary:
@@ -178,8 +186,6 @@ public class Piece : MonoBehaviour {
 		rhs = temp;
 	}
 
-	private static List<Trail> trails = new List<Trail>();
-
 	GameObject PlaceTrailBlock(Vector3 position) {
 		position += 0.5f * Vector3.forward;
 		GameObject block = Instantiate(trailBlockPrefab) as GameObject;
@@ -193,7 +199,6 @@ public class Piece : MonoBehaviour {
 		if (row != 0 && col != 0) { // Unset
 			DebugUtils.Assert(parent.pieceMap.Remove(new Pair<int, int>(row, col)));
 			g.SetSquare(row, col, new Square(SquareType.Empty));
-			//AddTrail(row, col, r, c);
 		}
 		row = r;
 		col = c;
@@ -220,9 +225,30 @@ public class Piece : MonoBehaviour {
 		if (p == null) {
 			return false;
 		}
+		int oldRow = row;
+		int oldCol = col;
 		ChangePosition(p.First, p.Second);
 
-		// Check if the square behind the spot moved to is an enemy
+		if (!LookForTrail(dir, oldRow, oldCol)) {
+			// Check if the square behind the spot moved to is an enemy
+			LookForEnemy(dir);
+		}
+
+		StartCoroutine(move(g.PosToCoord(row, col)));
+		
+		return true;
+	}
+
+	private bool LookForTrail(Direction dir, int oldRow, int oldCol) {
+		trailLoc = g.FindEnemyTrail(dir, oldRow, oldCol, parent.opponentTrailType);
+		if (trailLoc == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	private void LookForEnemy(Direction dir) {
 		Pair<SquareType, Pair<int, int>> type = g.SquareTypeAt(dir, row, col);
 		if (type != null && type.First == parent.opponentSquareType) {
 			Pair<int, int> enemyPos = type.Second;
@@ -235,16 +261,12 @@ public class Piece : MonoBehaviour {
 				pieceToDestroy = enemyPiece;
 				DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
 				g.Clear(enemyPos);
-
+				
 				if (gameState.takeEnemySpot) {
 					ChangePosition(enemyPos.First, enemyPos.Second);
 				}
 			}
 		}
-
-		StartCoroutine(move(g.PosToCoord(row, col)));
-		
-		return true;
 	}
 
 	private void CreateArrows() {
@@ -288,6 +310,11 @@ public class Piece : MonoBehaviour {
 		Pair<int, int> lastPos = null;
 		while (transform.position != to) {
 			Pair<int, int> pos = g.CoordToPos(transform.position, false);
+			if (pos == trailLoc) {
+				destroyThis = true;
+				moving = false; // TODO: Hack
+				yield break;
+			}
 			if (lastPos != pos) {
 				Square s = new Square(parent.trailType);
 				s.turnsRemaining = 4;
