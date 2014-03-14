@@ -93,6 +93,7 @@ public class Piece : MonoBehaviour {
 		switch(state) {
 		case State.Sliding:
 			if (moving == false) {
+				Pulse.guard = false;
 				drawArrows = true;
 				state = State.Stationary;
 				keymap = parent.opponentKeymap;
@@ -112,6 +113,7 @@ public class Piece : MonoBehaviour {
 			}
 
 			if (HandleKeyboardInput()) {
+				Pulse.guard = true;
 				state = State.Sliding;
 				DestroyArrows();
 				Camera.main.audio.Play();
@@ -179,6 +181,7 @@ public class Piece : MonoBehaviour {
 	private static List<Trail> trails = new List<Trail>();
 
 	GameObject PlaceTrailBlock(Vector3 position) {
+		position += 0.5f * Vector3.forward;
 		GameObject block = Instantiate(trailBlockPrefab) as GameObject;
 		block.transform.position = position;
 		block.renderer.material.color = parent.trailColor;
@@ -287,7 +290,7 @@ public class Piece : MonoBehaviour {
 			Pair<int, int> pos = g.CoordToPos(transform.position, false);
 			if (lastPos != pos) {
 				Square s = new Square(parent.trailType);
-				s.turnsRemaining = 3;
+				s.turnsRemaining = 4;
 
 				Vector3 coord = g.PosToCoord(pos.First, pos.Second);
 				GameObject block = PlaceTrailBlock(coord);
