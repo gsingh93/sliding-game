@@ -79,7 +79,7 @@ public class Piece : MonoBehaviour {
 	}
 	
 	private void OnMouseDown() {
-		if (turn == parent.player) {
+		if (turn == parent.player && !parent.useAI) {
 			isActive = true;
 		}
 	}
@@ -91,7 +91,7 @@ public class Piece : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (!isActive || turn != parent.player) {
+		if (!isActive || turn != parent.player || parent.useAI) {
 			return;
 		}
 
