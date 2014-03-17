@@ -111,7 +111,6 @@ public class Piece : MonoBehaviour {
 				if (destroyThis) {
 					DestroyPiece();
 				}
-				g.Print();
 			}
 			break;
 		case State.Stationary:
@@ -169,11 +168,13 @@ public class Piece : MonoBehaviour {
 		}
 
 		public void TurnPassed() {
+			finished = true;
 			for (int i = coords.Count - 1; i >= 0; i--) {
 				squares[i].turnsRemaining--;
 				if (squares[i].turnsRemaining == 0) {
-					finished = true;
 					RemoveTrailBlock(i);
+				} else if (squares[i].turnsRemaining > 0) {
+					finished = false;
 				}
 			}
 		}
@@ -243,14 +244,16 @@ public class Piece : MonoBehaviour {
 			// Check if the square behind the spot moved to is an enemy
 			if (!LookForEnemy(dir, p.First, p.Second)) {
 				ChangePosition(p.First, p.Second);
+				StartCoroutine(move(g.PosToCoord(p.First, p.Second)));
+			} else {
+				StartCoroutine(move(g.PosToCoord(row, col)));
 			}
 		} else {
+			// Don't change position and then clear because we might overwrite an actual square
 			g.Clear(new Pair<int, int>(row, col));
-			//ChangePosition(p.First, p.Second);
+			StartCoroutine(move(g.PosToCoord(p.First, p.Second)));
 		}
-
-		StartCoroutine(move(g.PosToCoord(p.First, p.Second)));
-		
+				
 		return true;
 	}
 
@@ -276,7 +279,7 @@ public class Piece : MonoBehaviour {
 				pieceToDestroy = enemyPiece;
 				DebugUtils.Assert(opponent.pieceMap.Remove(enemyPos));
 				g.Clear(enemyPos);
-				
+
 				if (gameState.takeEnemySpot) {
 					ChangePosition(enemyPos.First, enemyPos.Second);
 				} else {
@@ -330,34 +333,27 @@ public class Piece : MonoBehaviour {
 
 		Vector3 velocity = speed * (to - transform.position).normalized;
 		Pair<int, int> lastPos = null;
-		Debug.Log("Trail loc: " + trailLoc);
-		Debug.Log(transform.position);
-		Debug.Log(to);
 		while (transform.position != to) {
 			Pair<int, int> pos = g.CoordToPos(transform.position, false);
-			Debug.Log(pos);
 			if (pos == trailLoc) {
 				destroyThis = true;
 				moving = false; // TODO: Hack
 				yield break;
 			}
 			if (lastPos != pos && !(pos.First == row && pos.Second == col)) {
-				Square s;
-				Square currentSquare = g.GetSquare(row, col);
-				if (currentSquare.type == parent.trailType) {
-					s = currentSquare;
-					s.turnsRemaining += 4;
-				} else {
-					s = new Square(parent.trailType);
+				Square currentSquare = g.GetSquare(pos.First, pos.Second);
+				if (currentSquare.type != parent.trailType) {
+					Square s = new Square(parent.trailType);
 					s.turnsRemaining = 4;
+
+					Vector3 coord = g.PosToCoord(pos.First, pos.Second);
+					GameObject block = PlaceTrailBlock(coord);
+					t.Add(pos, s, block);
+
+					g.SetSquare(pos.First, pos.Second, s);
+				} else {
+					currentSquare.turnsRemaining += 4;
 				}
-
-				Vector3 coord = g.PosToCoord(pos.First, pos.Second);
-				GameObject block = PlaceTrailBlock(coord);
-				t.Add(pos, s, block);
-
-				g.SetSquare(pos.First, pos.Second, s);
-
 				lastPos = pos;
 			}
 			// TODO: Why does this have to come after?
@@ -366,7 +362,6 @@ public class Piece : MonoBehaviour {
 			yield return null;
 		}
 		transform.position = to;
-		g.Print();
 
 		moving = false;
 	}

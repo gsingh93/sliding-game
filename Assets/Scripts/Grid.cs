@@ -56,7 +56,6 @@ public class Grid : MonoBehaviour {
 				break;
 			}
 			SquareType squareType = grid[row, col].type;
-			Debug.Log(squareType);
 			if(squareType == enemyTrail) {
 				found = true;
 				break;
