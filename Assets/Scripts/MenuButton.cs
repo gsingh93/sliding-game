@@ -25,9 +25,9 @@ public class MenuButton : MonoBehaviour {
 			Application.LoadLevel("Board");
 			break;
 		case Button.PlayComp:
-			GameObject.Find("GameState").GetComponent<GameState>().useAI = true;
-			Application.LoadLevel("Board");
-			break;
+			//GameObject.Find("GameState").GetComponent<GameState>().useAI = true;
+			//Application.LoadLevel("Board");
+			//break;
 		case Button.Options:
 		case Button.Help:
 			break;
