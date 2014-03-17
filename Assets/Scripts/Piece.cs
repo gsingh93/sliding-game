@@ -111,6 +111,7 @@ public class Piece : MonoBehaviour {
 				if (destroyThis) {
 					DestroyPiece();
 				}
+				g.Print();
 			}
 			break;
 		case State.Stationary:
@@ -244,16 +245,17 @@ public class Piece : MonoBehaviour {
 				ChangePosition(p.First, p.Second);
 			}
 		} else {
-			ChangePosition(p.First, p.Second);
+			g.Clear(new Pair<int, int>(row, col));
+			//ChangePosition(p.First, p.Second);
 		}
 
-		StartCoroutine(move(g.PosToCoord(row, col)));
+		StartCoroutine(move(g.PosToCoord(p.First, p.Second)));
 		
 		return true;
 	}
 
 	private bool LookForTrail(Direction dir, int oldRow, int oldCol) {
-		trailLoc = g.FindEnemyTrail(dir, oldRow, oldCol, parent.opponentTrailType);
+		trailLoc = g.FindEnemyTrail(dir, oldRow, oldCol, parent.opponentTrailType, parent.trailType);
 		if (trailLoc == null) {
 			return false;
 		}
@@ -328,16 +330,27 @@ public class Piece : MonoBehaviour {
 
 		Vector3 velocity = speed * (to - transform.position).normalized;
 		Pair<int, int> lastPos = null;
+		Debug.Log("Trail loc: " + trailLoc);
+		Debug.Log(transform.position);
+		Debug.Log(to);
 		while (transform.position != to) {
 			Pair<int, int> pos = g.CoordToPos(transform.position, false);
+			Debug.Log(pos);
 			if (pos == trailLoc) {
 				destroyThis = true;
 				moving = false; // TODO: Hack
 				yield break;
 			}
 			if (lastPos != pos && !(pos.First == row && pos.Second == col)) {
-				Square s = new Square(parent.trailType);
-				s.turnsRemaining = 4;
+				Square s;
+				Square currentSquare = g.GetSquare(row, col);
+				if (currentSquare.type == parent.trailType) {
+					s = currentSquare;
+					s.turnsRemaining += 4;
+				} else {
+					s = new Square(parent.trailType);
+					s.turnsRemaining = 4;
+				}
 
 				Vector3 coord = g.PosToCoord(pos.First, pos.Second);
 				GameObject block = PlaceTrailBlock(coord);
@@ -353,6 +366,7 @@ public class Piece : MonoBehaviour {
 			yield return null;
 		}
 		transform.position = to;
+		g.Print();
 
 		moving = false;
 	}

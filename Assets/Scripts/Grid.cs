@@ -44,7 +44,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	public Pair<int, int> FindEnemyTrail(Direction dir, int row, int col, SquareType type) {
+	public Pair<int, int> FindEnemyTrail(Direction dir, int row, int col, SquareType enemyTrail, SquareType myTrail) {
 		int stepC = directionOffsets[(int) dir].First;
 		int stepR = directionOffsets[(int) dir].Second;
 		
@@ -55,11 +55,13 @@ public class Grid : MonoBehaviour {
 			if (!InBounds(row, col)) {
 				break;
 			}
-			if(grid[row, col].type == type) {
+			SquareType squareType = grid[row, col].type;
+			Debug.Log(squareType);
+			if(squareType == enemyTrail) {
 				found = true;
 				break;
 			}
-			if (grid[row, col].type != SquareType.Empty) {
+			if (squareType != SquareType.Empty && squareType != myTrail) {
 				break;
 			}
 		}
@@ -121,6 +123,12 @@ public class Grid : MonoBehaviour {
 		BoundsCheck(row, col);
 
 		grid[row, col] = square;
+	}
+
+	public Square GetSquare(int row, int col) {
+		BoundsCheck(row, col);
+		
+		return grid[row, col];
 	}
 
 	public Pair<SquareType, Pair<int, int>> SquareTypeAt(Direction dir, int row, int col) {

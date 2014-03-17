@@ -118,7 +118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableBacking: 1
   takeEnemySpot: 1
-  useAI: 1
+  useAI: 0
 --- !u!4 &403090265
 Transform:
   m_ObjectHideFlags: 0
@@ -454,7 +454,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400002, guid: 91bc3b7f53a543a49b1eba9eff3b5a80, type: 2}
       propertyPath: useAI
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 91bc3b7f53a543a49b1eba9eff3b5a80, type: 2}
